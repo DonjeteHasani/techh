@@ -2,30 +2,31 @@
 session_start();
 include 'config.php';
 
-// Ensure the user is logged in
-if (!isset($_SESSION['is_logged_in'])) {
-    echo json_encode(['status' => 'error', 'message' => 'You must be logged in to add to wishlist.']);
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Please log in to manage your wishlist.']);
     exit;
 }
 
-// Get the user ID and product ID
 $userId = $_SESSION['user_id'];
-$productId = $_POST['product_id'];
+$productId = intval($_POST['product_id']);
+$action = $_POST['action'];
 
-// Check if the product is already in the wishlist
-$checkStmt = $pdo->prepare("SELECT * FROM wishlist WHERE user_id = ? AND product_id = ?");
-$checkStmt->execute([$userId, $productId]);
-$exists = $checkStmt->fetch();
-
-if ($exists) {
-    // If product is already in wishlist, respond with a message
-    echo json_encode(['status' => 'error', 'message' => 'This product is already in your wishlist.']);
+if (!$productId || !in_array($action, ['add', 'remove'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request.']);
     exit;
 }
 
-// Add the product to the wishlist
-$insertStmt = $pdo->prepare("INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)");
-$insertStmt->execute([$userId, $productId]);
+try {
+    if ($action === 'add') {
+        $stmt = $pdo->prepare("INSERT IGNORE INTO wishlist (user_id, product_id) VALUES (?, ?)");
+        $stmt->execute([$userId, $productId]);
+        echo json_encode(['status' => 'success', 'message' => 'Added to wishlist!']);
+    } elseif ($action === 'remove') {
+        $stmt = $pdo->prepare("DELETE FROM wishlist WHERE user_id = ? AND product_id = ?");
+        $stmt->execute([$userId, $productId]);
+        echo json_encode(['status' => 'success', 'message' => 'Removed from wishlist!']);
+    }
+} catch (Exception $e) {
+    echo json_encode(['status' => 'error', 'message' => 'An error occurred.']);
+}
 
-echo json_encode(['status' => 'success', 'message' => 'Product added to wishlist successfully.']);
-exit;

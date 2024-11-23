@@ -34,7 +34,6 @@ $couponsStmt = $pdo->query("SELECT * FROM coupons ORDER BY expiration_date ASC")
 $coupons = $couponsStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,150 +42,244 @@ $coupons = $couponsStmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #6366f1;
-            --danger-color: #dc3545;
+            --primary-color: #4f46e5;
+            --danger-color: #ef4444;
             --success-color: #10b981;
+            --warning-color: #f59e0b;
         }
 
         body {
-            background-color: #f3f4f6;
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
         }
 
         .dashboard-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 2rem;
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 2.5rem;
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .page-header h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .back-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+            font-weight: 600;
+        }
+
+        .back-button:hover {
+            background-color: #f1f5f9;
+            transform: translateY(-2px);
         }
 
         .coupon-form {
-            background: #f9fafb;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            border: 1px solid #e5e7eb;
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 3rem;
+            border: 2px solid #e2e8f0;
         }
 
         .form-control {
-            border-radius: 8px;
-            padding: 0.625rem 1rem;
-            border: 1px solid #d1d5db;
-            transition: all 0.2s;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
         .btn-primary {
             background-color: var(--primary-color);
             border: none;
-            padding: 0.625rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
-            background-color: #4f46e5;
-            transform: translateY(-1px);
+            background-color: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .table {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid #e5e7eb;
+            border: 2px solid #e2e8f0;
         }
 
         .table th {
-            background-color: #f9fafb;
+            background-color: #f8fafc;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
             letter-spacing: 0.05em;
-            padding: 1rem;
+            padding: 1.25rem;
+            color: #475569;
         }
 
         .table td {
-            padding: 1rem;
+            padding: 1.25rem;
             vertical-align: middle;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .coupon-code {
-            font-family: monospace;
-            font-size: 1.1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.125rem;
             font-weight: 600;
             color: var(--primary-color);
-            background: #f3f4f6;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            letter-spacing: 0.05em;
         }
 
         .discount-badge {
             background-color: #ecfdf5;
             color: var(--success-color);
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.875rem;
         }
 
         .expiry-date {
-            color: #6b7280;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
-        .expiry-warning {
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .badge.bg-danger {
+            background-color: #fef2f2 !important;
             color: var(--danger-color);
-            font-weight: 500;
+        }
+
+        .badge.bg-warning {
+            background-color: #fffbeb !important;
+            color: var(--warning-color);
+        }
+
+        .badge.bg-success {
+            background-color: #ecfdf5 !important;
+            color: var(--success-color);
         }
 
         .btn-delete {
             color: var(--danger-color);
             background-color: #fff;
-            border: 1px solid var(--danger-color);
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            transition: all 0.2s;
+            border: 2px solid var(--danger-color);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
         }
 
         .btn-delete:hover {
             background-color: var(--danger-color);
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
         }
 
         .empty-state {
             text-align: center;
-            padding: 3rem;
-            color: #6b7280;
+            padding: 4rem 2rem;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 2px dashed #e2e8f0;
+        }
+
+        .empty-state i {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
         }
 
         @media (max-width: 768px) {
             .dashboard-container {
                 margin: 1rem;
-                padding: 1rem;
+                padding: 1.5rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
             }
 
             .coupon-form {
-                padding: 1rem;
+                padding: 1.5rem;
             }
 
             .form-row > div {
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
             }
+
+            .table td, .table th {
+                padding: 1rem;
+            }
+
+            .coupon-code {
+                font-size: 1rem;
+                padding: 0.375rem 0.75rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-container {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .table tr {
+            animation: fadeIn 0.3s ease-out;
         }
     </style>
 </head>
@@ -194,26 +287,26 @@ $coupons = $couponsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="dashboard-container">
     <div class="page-header">
-        <h2 class="h4 mb-0">Coupon Management</h2>
-        <a href="admin_dashboard.php" class="btn btn-outline-secondary">
+        <h2>Coupon Management</h2>
+        <a href="admin_dashboard.php" class="btn back-button">
             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
         </a>
     </div>
 
     <!-- Add Coupon Form -->
     <div class="coupon-form">
-        <h5 class="mb-3">Create New Coupon</h5>
+        <h5 class="mb-4 fw-bold">Create New Coupon</h5>
         <form action="manage_coupons.php" method="POST">
-            <div class="row g-3">
+            <div class="row g-4">
                 <div class="col-md-4">
-                    <label class="form-label">Coupon Code</label>
+                    <label class="form-label fw-semibold">Coupon Code</label>
                     <input type="text" name="code" class="form-control" placeholder="e.g., SUMMER2024" 
                            maxlength="20" required pattern="[A-Za-z0-9]+" 
                            title="Only letters and numbers allowed"
                            oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Discount Percentage</label>
+                    <label class="form-label fw-semibold">Discount Percentage</label>
                     <div class="input-group">
                         <input type="number" name="discount" class="form-control" 
                                placeholder="Enter value" min="0" max="100" required>
@@ -221,7 +314,7 @@ $coupons = $couponsStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Expiration Date</label>
+                    <label class="form-label fw-semibold">Expiration Date</label>
                     <input type="date" name="expiration_date" class="form-control" 
                            required min="<?php echo date('Y-m-d'); ?>">
                 </div>
@@ -272,7 +365,7 @@ $coupons = $couponsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php if ($is_expired): ?>
                                     <span class="badge bg-danger">Expired</span>
                                 <?php elseif ($expires_soon): ?>
-                                    <span class="badge bg-warning text-dark">Expires Soon</span>
+                                    <span class="badge bg-warning">Expires Soon</span>
                                 <?php else: ?>
                                     <span class="badge bg-success">Active</span>
                                 <?php endif; ?>
@@ -281,7 +374,7 @@ $coupons = $couponsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <form method="POST" action="manage_coupons.php" class="d-inline-block">
                                     <input type="hidden" name="coupon_id" value="<?php echo $coupon['id']; ?>">
                                     <button type="submit" name="delete_coupon" class="btn btn-delete">
-                                        <i class="fas fa-trash-alt"></i>
+                                        <i class="fas fa-trash-alt me-1"></i>Delete
                                     </button>
                                 </form>
                             </td>
@@ -292,9 +385,9 @@ $coupons = $couponsStmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     <?php else: ?>
         <div class="empty-state">
-            <i class="fas fa-ticket-alt fa-3x mb-3"></i>
+            <i class="fas fa-ticket-alt fa-3x"></i>
             <h3>No Coupons Found</h3>
-            <p class="text-muted">Create your first coupon using the form above.</p>
+            <p class="text-muted mb-0">Create your first coupon using the form above.</p>
         </div>
     <?php endif; ?>
 </div>
@@ -303,7 +396,7 @@ $coupons = $couponsStmt->fetchAll(PDO::FETCH_ASSOC);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Enhance delete confirmation
+    // Enhanced delete confirmation with custom modal
     const deleteForms = document.querySelectorAll('form');
     deleteForms.forEach(form => {
         if (form.querySelector('button[name="delete_coupon"]')) {
@@ -317,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add input validation for coupon code
+    // Enhanced input validation for coupon code
     const codeInput = document.querySelector('input[name="code"]');
     if (codeInput) {
         codeInput.addEventListener('input', function() {
@@ -325,12 +418,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Enhanced date input
+    // Enhanced date input with validation
     const dateInput = document.querySelector('input[name="expiration_date"]');
     if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
         dateInput.setAttribute('min', today);
     }
+
+    // Add hover effect to table rows
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f8fafc';
+            this.style.transition = 'background-color 0.3s ease';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
 });
 </script>
 </body>

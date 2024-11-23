@@ -72,6 +72,7 @@ $totalPages = ceil($totalProducts / $productsPerPage);
     <title>Product Management Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4361ee;
@@ -84,6 +85,7 @@ $totalPages = ceil($totalProducts / $productsPerPage);
         body {
             background-color: #f8f9fa;
             color: #333;
+            font-family: 'Inter', sans-serif;
         }
 
         .dashboard-header {
@@ -326,6 +328,17 @@ $totalPages = ceil($totalProducts / $productsPerPage);
                 </nav>
             </div>
         </div>
+
+        <div class="text-center mt-4 mb-5">
+            <a href="admin_dashboard.php" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
         <div class="text-center mt-4 mb-5">
             <a href="admin_dashboard.php" class="btn btn-secondary">

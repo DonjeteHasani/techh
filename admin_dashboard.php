@@ -17,16 +17,38 @@ $totalSales = $pdo->query("SELECT SUM(total_amount) FROM orders")->fetchColumn()
 
 // Fetch total orders
 $totalOrders = $pdo->query("SELECT COUNT(*) FROM orders")->fetchColumn();
+// Fetch sales data
+$salesData = $pdo->query("
+    SELECT DATE(order_date) AS sale_date, SUM(total_amount) AS daily_sales
+    FROM orders
+    GROUP BY DATE(order_date)
+    ORDER BY sale_date ASC
+")->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch most popular products (top 5)
-$stmt = $pdo->query("SELECT products.name, SUM(order_items.quantity) AS total_quantity 
-                     FROM order_items 
-                     JOIN products ON order_items.product_id = products.id 
-                     GROUP BY products.id 
-                     ORDER BY total_quantity DESC 
-                     LIMIT 5");
-$popularProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Calculate moving averages
+$movingAverageDays = 5;
+$salesForecast = [];
+for ($i = $movingAverageDays; $i < count($salesData); $i++) {
+    $sum = 0;
+    for ($j = $i - $movingAverageDays; $j < $i; $j++) {
+        $sum += $salesData[$j]['daily_sales'];
+    }
+    $salesForecast[] = round($sum / $movingAverageDays, 2);
+}
+
+// Fetch top trending products
+$popularProducts = $pdo->query("
+    SELECT products.name, SUM(order_items.quantity) AS total_quantity
+    FROM order_items
+    JOIN products ON order_items.product_id = products.id
+    JOIN orders ON order_items.order_id = orders.id
+    WHERE orders.order_date >= NOW() - INTERVAL 90 DAY
+    GROUP BY products.id
+    ORDER BY total_quantity DESC
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -202,6 +224,85 @@ $popularProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
+        /* Forecast Section */
+.forecast {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.forecast h3 {
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.forecast-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.forecast-item {
+    background: var(--light);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.forecast-item:hover {
+    transform: translateY(-3px);
+}
+
+.forecast-item h4 {
+    font-size: 1.2rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Alerts Section */
+.alerts {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alerts h3 {
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.alert-item {
+    background: var(--light);
+    border-left: 5px solid var(--warning);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-item i {
+    font-size: 1.5rem;
+    color: var(--warning);
+}
+
+.alert-item .alert-text {
+    flex-grow: 1;
+    color: var(--dark);
+}
+
+.no-alerts {
+    text-align: center;
+    color: var(--gray);
+}
+
 
         @media (max-width: 768px) {
             .container {
@@ -231,6 +332,13 @@ $popularProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 Logout
             </a>
         </header>
+        <!-- Alerts Section -->
+     <div class="alerts" id="alerts">
+    <h3>Alerts</h3>
+    <p class="no-alerts">Loading alerts...</p>
+</div>
+<br>
+<br>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -260,6 +368,21 @@ $popularProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="stat-label">Processed orders</div>
             </div>
         </div>
+        <div class="forecast">
+    <h3>Sales Forecast for Next 5 Days</h3>
+    <?php if (!empty($salesForecast)): ?>
+        <div class="forecast-list">
+            <?php for ($i = 1; $i <= 5; $i++): ?>
+                <div class="forecast-item">
+                    <h4>Day <?php echo $i; ?></h4>
+                    <p>$<?php echo $salesForecast[count($salesForecast) - 1]; ?></p>
+                </div>
+            <?php endfor; ?>
+        </div>
+    <?php else: ?>
+        <p class="no-alerts">Not enough data to calculate a forecast.</p>
+    <?php endif; ?>
+</div>
 
         <div class="popular-products">
             <h3>Popular Products</h3>
@@ -292,5 +415,56 @@ $popularProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </a>
         </div>
     </div>
+     
+
 </body>
+<script>
+        // Fetch alerts every 10 seconds
+        setInterval(() => {
+    fetch('fetch_alerts.php')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Debugging: Check the response structure
+
+            let alertHTML = '';
+
+            // Low Stock Alerts
+            if (data.lowStock.length > 0) {
+                alertHTML += '<h3>Low Stock Alerts</h3>';
+                data.lowStock.forEach(item => {
+                    alertHTML += `
+                        <div class="alert-item">
+                            <i class="fas fa-box-open"></i>
+                            <div class="alert-text">${item.name} - ${item.stock} units left</div>
+                        </div>`;
+                });
+            }
+
+            // High-Demand Alerts
+            if (data.highDemand.length > 0) {
+                alertHTML += '<h3>High-Demand Products</h3>';
+                data.highDemand.forEach(item => {
+                    alertHTML += `
+                        <div class="alert-item">
+                            <i class="fas fa-chart-line"></i>
+                            <div class="alert-text">${item.name} - ${item.total_quantity} units sold this week</div>
+                        </div>`;
+                });
+            }
+
+            // No Alerts
+            if (alertHTML === '') {
+                alertHTML = '<p class="no-alerts">No alerts at the moment.</p>';
+            }
+
+            document.getElementById('alerts').innerHTML = alertHTML;
+        })
+        .catch(error => {
+            console.error('Error fetching alerts:', error);
+            document.getElementById('alerts').innerHTML = '<p class="no-alerts">Error loading alerts.</p>';
+        });
+}, 10000);
+
+
+    </script>
 </html>

@@ -1,1 +1,1 @@
-# techh
+# TechAI

@@ -44,6 +44,7 @@ $totalPages = ceil($totalOrders / $ordersPerPage);
     <title>Orders Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4361ee;
@@ -57,6 +58,8 @@ $totalPages = ceil($totalOrders / $ordersPerPage);
         body {
             background-color: #f8f9fa;
             color: #333;
+            font-family: 'Inter', sans-serif;
+            
         }
 
         .dashboard-header {

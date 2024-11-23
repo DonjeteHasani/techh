@@ -1,18 +1,21 @@
 <?php
-function getSimilarProducts($productId, $limit = 5) {
-    global $pdo;
+function getSimilarProducts($productId, $pdo, $limit = 5) {
     $stmt = $pdo->prepare("
         SELECT * FROM products 
-        WHERE category_id = (SELECT category_id FROM products WHERE id = ?)
-        AND id != ? 
-        LIMIT ?
+        WHERE category_id = (SELECT category_id FROM products WHERE id = :product_id)
+        AND id != :product_id 
+        LIMIT :limit
     ");
-    $stmt->execute([$productId, $productId, $limit]);
+
+    // Bind parameters explicitly
+    $stmt->bindValue(':product_id', $productId, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function getRecommendationsBasedOnHistory($userId, $limit = 5) {
-    global $pdo;
+function getRecommendationsBasedOnHistory($userId, $pdo, $limit = 5) {
     $stmt = $pdo->prepare("
         SELECT DISTINCT p.*
         FROM products p
@@ -20,11 +23,17 @@ function getRecommendationsBasedOnHistory($userId, $limit = 5) {
         WHERE oi.order_id IN (
             SELECT o.id 
             FROM orders o 
-            WHERE o.user_id = ?
+            WHERE o.user_id = :user_id
         )
-        LIMIT ?
+        LIMIT :limit
     ");
-    $stmt->execute([$userId, $limit]);
+
+    // Bind parameters explicitly
+    $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
+

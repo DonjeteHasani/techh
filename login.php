@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -34,24 +34,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+     <!-- Social Media Meta Tags -->
+     <meta property="og:title" content="TechAI - Premium Tech Products">
+    <meta property="og:description" content="Discover our curated collection of premium tech products and accessories at TechAI">
+    <meta property="og:image" content="https://techai.com/images/social-preview.jpg">
+    <meta property="og:url" content="https://techai.com/products">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@techai">
+    <meta name="twitter:title" content="TechAI - Premium Tech Products">
+    <meta name="twitter:description" content="Discover our curated collection of premium tech products and accessories at TechAI">
+    <meta name="twitter:image" content="https://techai.com/images/social-preview.jpg">
     <style>
         :root {
-            --primary-color: #4A90E2;
-            --error-color: #e74c3c;
+            --primary-color: #4361ee;
+            --error-color: #ef233c;
             --success-color: #2ecc71;
-            --background-color: #f5f6fa;
-            --box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+            --background-color: #f8f9fa;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --text-primary: #2b2d42;
+            --text-secondary: #6c757d;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background-color: var(--background-color);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -60,120 +74,151 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .login-container {
             background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
+            padding: 3rem;
+            border-radius: 16px;
             box-shadow: var(--box-shadow);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             margin: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .login-header h1 {
-            color: #2c3e50;
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
         }
 
         .login-header p {
-            color: #7f8c8d;
-            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
             position: relative;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #2c3e50;
-            font-weight: 500;
-            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
         .input-group {
             position: relative;
+            transition: all 0.3s ease;
         }
 
         .input-group input {
             width: 100%;
-            padding: 0.8rem 1rem;
-            padding-left: 2.5rem;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            padding-left: 3rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s ease;
+            background-color: #f8f9fa;
         }
 
         .input-group i {
             position: absolute;
-            left: 1rem;
+            left: 1.25rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #95a5a6;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within i {
+            color: var(--primary-color);
         }
 
         .input-group input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
         }
 
         .alert {
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            background-color: #fde8e8;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
             color: var(--error-color);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         .login-button {
             width: 100%;
-            padding: 0.8rem;
+            padding: 1rem;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .login-button:hover {
-            background-color: #357abd;
+            background-color: #3651d4;
+            transform: translateY(-2px);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
         }
 
         .signup-link {
             text-align: center;
-            margin-top: 1.5rem;
-            color: #7f8c8d;
-            font-size: 0.9rem;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
         }
 
         .signup-link a {
             color: var(--primary-color);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
         }
 
         .signup-link a:hover {
+            color: #3651d4;
             text-decoration: underline;
         }
 
         @media (max-width: 480px) {
             .login-container {
-                padding: 1.5rem;
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .login-header h1 {
+                font-size: 1.75rem;
             }
         }
     </style>
@@ -228,9 +273,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
 
             <div class="signup-link">
-                Don't have an account? <a href="register.php">Sign up here</a>
+                Don't have an account?<a href="register.php">Sign up here</a>
             </div>
         </form>
     </div>
 </body>
 </html>
+

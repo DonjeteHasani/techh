@@ -29,7 +29,6 @@ if ($priceFilter) {
 }
 
 // Apply sorting
-// Apply sorting
 if ($sortFilter === "price-low") {
     $query .= " ORDER BY price ASC";
 } elseif ($sortFilter === "price-high") {
@@ -37,6 +36,7 @@ if ($sortFilter === "price-low") {
 } elseif ($sortFilter === "name") {
     $query .= " ORDER BY name ASC";
 }
+
 // Pagination
 $query .= " LIMIT :offset, :items_per_page";
 
@@ -60,242 +60,284 @@ $total_pages = ceil($total_products / $items_per_page);
     <title>Products - TechAI</title>
     
     <!-- Stylesheets -->
+   <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+     <!-- Social Media Meta Tags -->
+     <meta property="og:title" content="TechAI - Premium Tech Products">
+    <meta property="og:description" content="Discover our curated collection of premium tech products and accessories at TechAI">
+    <meta property="og:image" content="https://techai.com/images/social-preview.jpg">
+    <meta property="og:url" content="https://techai.com/products">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@techai">
+    <meta name="twitter:title" content="TechAI - Premium Tech Products">
+    <meta name="twitter:description" content="Discover our curated collection of premium tech products and accessories at TechAI">
+    <meta name="twitter:image" content="https://techai.com/images/social-preview.jpg">
     <style>
-        /* Custom styles - matching index.php */
         :root {
             --primary-color: #2563eb;
             --secondary-color: #1e40af;
             --accent-color: #dbeafe;
-        }
-         .navbar {
-            background-color: white !important;
-            box-shadow: var(--card-shadow);
-            padding: 1rem 0;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--primary-color) !important;
-            font-size: 1.5rem;
-        }
-
-        .nav-link {
-            font-weight: 500;
-            color: #374151 !important;
-            transition: color 0.2s;
-            padding: 0.5rem 1rem !important;
-            margin: 0 0.25rem;
+            --text-primary: #1a365d;
+            --text-secondary: #475569;
+            --bg-light: #f8fafc;
+            --transition: all 0.3s ease;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --radius-sm: 0.5rem;
+            --radius-md: 1rem;
+            --radius-lg: 2rem;
         }
 
-        .nav-link:hover {
-            color: var(--primary-color) !important;
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: #ffffff;
         }
 
-        .cart-badge .badge {
-            position: absolute;
-            top: 0;
-            right: -5px;
-            background-color: var(--primary-color);
-        }
+        /* Enhanced Navbar */
+        .navbar {
+        padding: 1rem 0;
+        background: white !important;
+        box-shadow: var(--card-shadow);
+    }
 
+    .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary-color) !important;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        padding: 0.5rem 1rem !important;
+        color: var(--text-color) !important;
+        transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+        color: var(--primary-color) !important;
+    }
+
+        /* Enhanced Header */
         .page-header {
-            background: linear-gradient(135deg, var(--accent-color) 0%, #ffffff 100%);
-            padding: 2rem 0;
-            margin-bottom: 3rem;
-            border-radius: 0 0 2rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 4rem;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            text-align: center;
         }
 
         .page-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #1a365d;
+            font-size: 3rem;
+            font-weight: 800;
             margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
+        /* Enhanced Filter Section */
         .filter-section {
-            background-color: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            margin-bottom: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 3rem;
         }
 
         .filter-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1a365d;
-            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
         }
 
+        .form-select {
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--accent-color);
+            transition: var(--transition);
+        }
+
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25);
+        }
+
+        /* Enhanced Product Cards */
         .product-card {
             border: none;
-            border-radius: 1rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 2rem;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            background: white;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
         }
 
         .product-card .card-img-top {
-            height: 200px;
+            height: 250px;
             object-fit: cover;
-            border-radius: 1rem 1rem 0 0;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .card-img-top {
+            transform: scale(1.05);
         }
 
         .product-card .card-body {
-            padding: 1.5rem;
+            padding: 2rem;
         }
 
         .product-card .card-title {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-price {
-            color: var(--primary-color);
             font-size: 1.25rem;
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: 1rem;
         }
 
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
         .btn-view-product {
-            width: 100%;
-            background-color: var(--primary-color);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             border: none;
-            padding: 0.8rem;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
+            padding: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
         }
 
         .btn-view-product:hover {
-            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
         }
 
+        /* Enhanced Pagination */
         .pagination {
-            margin-top: 2rem;
-            justify-content: center;
+            margin-top: 3rem;
+            gap: 0.5rem;
         }
 
         .page-link {
-            color: var(--primary-color);
-            border: none;
-            padding: 0.5rem 1rem;
-            margin: 0 0.25rem;
-            border-radius: 0.5rem;
-        }
-
-        .page-link:hover {
-            background-color: var(--accent-color);
-            color: var(--primary-color);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            transition: var(--transition);
         }
 
         .page-item.active .page-link {
-            background-color: var(--primary-color);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+        }
+
+        /* Enhanced Services Section */
+        .services-section {
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            padding: 5rem 0;
+            margin-top: 5rem;
+        }
+
+        .services-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        .services-description {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto 4rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .service-card i {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .service-card:hover i,
+        .service-card:hover h2,
+        .service-card:hover p {
             color: white;
         }
 
+        /* Enhanced Footer */
         footer {
-            background-color: #f8fafc;
-            padding: 2rem 0;
-            margin-top: 4rem;
+            background: var(--bg-light);
+            padding: 4rem 0 2rem;
+            margin-top: 5rem;
         }
 
         .footer-content {
-            color: #475569;
+            color: var(--text-secondary);
         }
-        
 
-/* General Services Section Styling */
-.services-section {
-    margin-top: 60px;
-    margin-bottom: 60px;
-    padding: 20px;
-    background-color: #fafafa; /* Optional: Add a light background for separation */
-    text-align: center;
-}
+        .footer-content a {
+            transition: var(--transition);
+        }
 
-.services-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
+        .footer-content a:hover {
+            color: var(--primary-color) !important;
+        }
 
-.services-title {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    font-weight: 600;
-    color: #599ee9;
-}
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 3rem 0;
+            }
 
-.services-description {
-    font-size: 1.2rem;
-    margin-bottom: 40px;
-    color: #333;
-}
+            .page-title {
+                font-size: 2.5rem;
+            }
 
-/* Services List Styling */
-.services-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px; /* Space between cards */
-    max-width: 1200px;
-    width: 100%;
-}
+            .services-title {
+                font-size: 2.5rem;
+            }
 
-.service-card {
-    width: 300px;
-    padding: 20px;
-    border-radius: 10px;
-    background: #fff;
-    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    transition: transform 0.3s ease, background 0.3s ease;
-}
-
-.service-card i {
-    margin: 20px 0;
-    color: #ff5724;
-    font-size: 38px;
-}
-
-.service-title {
-    margin-bottom: 12px;
-    font-weight: 600;
-    color: #333;
-}
-
-.service-description {
-    color: #6c757d;
-}
-
-.service-card:hover {
-    transform: translateY(-5px);
-    background: linear-gradient(45deg, rgba(255, 28, 8, 0.7), rgba(255, 0, 82, 0.7));
-    color: #fff;
-}
-
-.service-card:hover i,
-.service-card:hover h2,
-.service-card:hover p {
-    color: #fff;
-}
-
-
-   
+            .product-card .card-img-top {
+                height: 200px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-store me-2"></i>TechAI
+                <i class="fas fa-microchip me-2"></i>TechAI
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -303,17 +345,37 @@ $total_pages = ceil($total_products / $items_per_page);
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php"><i class="fas fa-home me-1"></i>Home</a>
+                        <a class="nav-link" href="index.php">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="products.php"><i class="fas fa-box me-1"></i>Products</a>
+                        <a class="nav-link active" href="products.php">
+                            <i class="fas fa-box me-1"></i>Products
+                        </a>
                     </li>
                     <?php if (!isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item"><a class="nav-link" href="login.php"><i class="fas fa-sign-in-alt me-1"></i>Login</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.php">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
                     <?php else: ?>
-                        <li class="nav-item"><a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart me-1"></i>Cart</a></li>
-                        <li class="nav-item"><a class="nav-link" href="profile.php"><i class="fas fa-user me-1"></i>Profile</a></li>
-                        <li class="nav-item"><a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt me-1"></i>Logout</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="cart.php">
+                                <i class="fas fa-shopping-cart me-1"></i>Cart
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.php">
+                                <i class="fas fa-user me-1"></i>Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="logout.php">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </a>
+                        </li>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -323,8 +385,8 @@ $total_pages = ceil($total_products / $items_per_page);
     <!-- Page Header -->
     <header class="page-header">
         <div class="container">
-            <h1 class="page-title">Our Products</h1>
-            <p class="text-secondary">Discover our wide range of premium tech products and accessories.</p>
+            <h1 class="page-title">Discover Our Products</h1>
+            <p class="lead text-white-50">Explore our curated collection of premium tech products and accessories</p>
         </div>
     </header>
 
@@ -360,21 +422,20 @@ $total_pages = ceil($total_products / $items_per_page);
         </div>
 
         <!-- Products Grid -->
-        <div class="row">
+        <div class="row g-4">
             <?php foreach ($products as $product): ?>
                 <div class="col-md-3">
-                    <div class="product-card card">
+                    <div class="product-card card h-100">
                         <img src="<?php echo htmlspecialchars($product['image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h5>
                             <p class="product-price">$<?php echo number_format($product['price'], 2); ?></p>
-                            <a href="productdetail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary btn-view-product">View Details</a>
+                            <a href="productdetail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary btn-view-product mt-auto">View Details</a>
                         </div>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
-        
 
         <!-- Pagination -->
         <?php if ($total_pages > 1): ?>
@@ -388,65 +449,70 @@ $total_pages = ceil($total_products / $items_per_page);
             </ul>
         </nav>
         <?php endif; ?>
+
+        <!-- Services Section -->
         <div class="services-section">
-    <div class="services-container">
-        <h1 class="services-title">Our Services</h1>
-        <p class="services-description">
-            Our company offers a variety of services to meet your needs. Here are some of the key services we provide:
-        </p>
-
-        <div class="services-list">
-            <div class="service-card">
-                <i class='bx bxs-purchase-tag-alt'></i>
-                <h2 class="service-title">Selling Product</h2>
-                <p class="service-description">
-                    We offer the latest technology products to meet your requirements.
+            <div class="container">
+                <h1 class="services-title text-center">Our Services</h1>
+                <p class="services-description text-center">
+                    Experience excellence with our comprehensive range of tech services designed to meet your every need
                 </p>
-            </div>
-            <div class="service-card">
-                <i class='bx bx-wrench'></i>
-                <h2 class="service-title">Repair</h2>
-                <p class="service-description">
-                    If you have issues with your tech devices, we provide repair services.
-                </p>
-            </div>
-            <div class="service-card">
-                <i class='bx bxs-devices'></i>
-                <h2 class="service-title">Swap</h2>
-                <p class="service-description">
-                    We provide a 1-2 year warranty on products and service them free of charge if needed.
-                </p>
-            </div>
-        </div> <!-- Close services-list -->
-    </div> <!-- Close services-container -->
-</div> <!-- Close services-section -->
 
-
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="service-card text-center">
+                            <i class='bx bxs-purchase-tag-alt'></i>
+                            <h2 class="service-title">Premium Products</h2>
+                            <p class="service-description">
+                                Discover the latest and most innovative technology products carefully selected for you
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="service-card text-center">
+                            <i class='bx bx-wrench'></i>
+                            <h2 class="service-title">Expert Repair</h2>
+                            <p class="service-description">
+                                Professional repair services for all your tech devices by certified technicians
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="service-card text-center">
+                            <i class='bx bxs-devices'></i>
+                            <h2 class="service-title">Device Swap</h2>
+                            <p class="service-description">
+                                Comprehensive warranty coverage with free servicing for up to 2 years
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
-
 
     <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="row">
+            <div class="row gy-4">
                 <div class="col-md-4">
-                    <h5 class="mb-3">About TechAI</h5>
-                    <p class="footer-content">Your trusted destination for premium tech products and accessories.</p>
+                    <h5 class="fw-bold mb-3">About TechAI</h5>
+                    <p class="footer-content">Your premier destination for cutting-edge tech products and exceptional service.</p>
                 </div>
                 <div class="col-md-4">
-                    <h5 class="mb-3">Quick Links</h5>
+                    <h5 class="fw-bold mb-3">Quick Links</h5>
                     <ul class="list-unstyled footer-content">
-                        <li><a href="products.php" class="text-decoration-none text-secondary">Products</a></li>
-                        <li><a href="#" class="text-decoration-none text-secondary">About Us</a></li>
-                        <li><a href="#" class="text-decoration-none text-secondary">Contact</a></li>
+                        <li class="mb-2"><a href="products.php" class="text-decoration-none text-secondary">Products</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">About Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
-                    <h5 class="mb-3">Connect With Us</h5>
+                    <h5 class="fw-bold mb-3">Connect With Us</h5>
                     <div class="footer-content">
-                        <a href="https://www.facebook.com" class="text-secondary me-3"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://www.x.com" class="text-secondary me-3"><i class="fab fa-twitter"></i></a>
-                        <a href="https://www.instagram.com" class="text-secondary me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com" class="text-secondary me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="https://www.x.com" class="text-secondary me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="https://www.instagram.com" class="text-secondary me-3"><i class="fab fa-instagram fa-lg"></i></a>
                     </div>
                 </div>
             </div>
@@ -456,8 +522,7 @@ $total_pages = ceil($total_products / $items_per_page);
         </div>
     </footer>
 
- <!-- Tawk.to Chatbot Integration -->
-    <!--Start of Tawk.to Script-->
+    <!-- Tawk.to Chatbot Integration -->
     <script type="text/javascript">
     var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
     (function(){
@@ -469,14 +534,12 @@ $total_pages = ceil($total_products / $items_per_page);
         s0.parentNode.insertBefore(s1, s0);
     })();
     </script>
-    <!--End of Tawk.to Script-->
 
-   
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // JavaScript for handling filter changes
+        // Enhanced filter handling with smooth transitions
         document.getElementById('priceFilter').addEventListener('change', function() {
             applyFilters();
         });
@@ -502,8 +565,21 @@ $total_pages = ceil($total_products / $items_per_page);
                 params.delete('sortFilter');
             }
 
+            // Add loading state
+            document.body.style.cursor = 'wait';
+            const products = document.querySelector('.row.g-4');
+            products.style.opacity = '0.5';
+            products.style.transition = 'opacity 0.3s ease';
+
+            // Navigate to new URL
             window.location.search = params.toString();
         }
+
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
     </script>
 </body>
 </html>

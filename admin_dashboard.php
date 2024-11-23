@@ -26,7 +26,7 @@ $salesData = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // Calculate moving averages
-$movingAverageDays = 5;
+$movingAverageDays = 4;
 $salesForecast = [];
 for ($i = $movingAverageDays; $i < count($salesData); $i++) {
     $sum = 0;
@@ -56,6 +56,8 @@ $popularProducts = $pdo->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -65,6 +67,7 @@ $popularProducts = $pdo->query("
 
         :root {
             --primary: #4361ee;
+            --secondary: #3d5a80;
             --success: #2ec4b6;
             --info: #3a86ff;
             --warning: #ff9f1c;
@@ -72,251 +75,310 @@ $popularProducts = $pdo->query("
             --light: #f8f9fa;
             --dark: #212529;
             --gray: #6c757d;
+            --transition: all 0.3s ease;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #f0f2f5;
             color: var(--dark);
             line-height: 1.6;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 2rem;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 1.5rem 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
         .header h2 {
-            color: var(--dark);
-            font-size: 1.5rem;
-            font-weight: 600;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
         }
 
         .logout-btn {
-            background: var(--danger);
+            background: rgba(255,255,255,0.2);
             color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.8rem;
+            backdrop-filter: blur(5px);
         }
 
         .logout-btn:hover {
-            opacity: 0.9;
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .stat-card {
             background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            opacity: 0;
+            transition: var(--transition);
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
         }
 
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
         .stat-header {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
             color: var(--gray);
         }
 
         .stat-icon {
-            font-size: 1.5rem;
+            font-size: 2rem;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 12px;
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .stat-label {
             color: var(--gray);
-            font-size: 0.9rem;
+            font-size: 1rem;
+            font-weight: 500;
         }
 
         .popular-products {
             background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         .popular-products h3 {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 600;
         }
 
         .product-list {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
 
         .product-item {
             background: var(--light);
-            padding: 1rem;
-            border-radius: 8px;
+            padding: 1.5rem;
+            border-radius: 12px;
             text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .product-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .product-name {
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
         }
 
         .product-quantity {
-            color: var(--gray);
-            font-size: 0.9rem;
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 500;
         }
 
         .quick-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2.5rem;
         }
 
         .quick-link {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 1rem;
             background: white;
             color: var(--dark);
-            padding: 1rem;
-            border-radius: 8px;
+            padding: 1.5rem;
+            border-radius: 12px;
             text-decoration: none;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            font-weight: 500;
         }
 
         .quick-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            background: var(--primary);
+            color: white;
         }
-        /* Forecast Section */
-.forecast {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
-.forecast h3 {
-    margin-bottom: 1rem;
-    color: var(--dark);
-}
+        .forecast {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
 
-.forecast-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
+        .forecast h3 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
 
-.forecast-item {
-    background: var(--light);
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-}
+        .forecast-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
 
-.forecast-item:hover {
-    transform: translateY(-3px);
-}
+        .forecast-item {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
 
-.forecast-item h4 {
-    font-size: 1.2rem;
-    color: var(--primary);
-    margin-bottom: 0.5rem;
-}
+        .forecast-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
 
-/* Alerts Section */
-.alerts {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-top: 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+        .forecast-item h4 {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
 
-.alerts h3 {
-    margin-bottom: 1rem;
-    color: var(--dark);
-}
+        .alerts {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
 
-.alert-item {
-    background: var(--light);
-    border-left: 5px solid var(--warning);
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
+        .alerts h3 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
 
-.alert-item i {
-    font-size: 1.5rem;
-    color: var(--warning);
-}
+        .alert-item {
+            background: var(--light);
+            border-left: 5px solid var(--warning);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+        }
 
-.alert-item .alert-text {
-    flex-grow: 1;
-    color: var(--dark);
-}
+        .alert-item:hover {
+            transform: translateX(5px);
+        }
 
-.no-alerts {
-    text-align: center;
-    color: var(--gray);
-}
+        .alert-item i {
+            font-size: 1.8rem;
+            color: var(--warning);
+        }
 
+        .alert-item .alert-text {
+            flex-grow: 1;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .no-alerts {
+            text-align: center;
+            color: var(--gray);
+            padding: 2rem;
+            font-size: 1.1rem;
+        }
 
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
+                padding: 1rem;
             }
 
             .header {
                 flex-direction: column;
-                gap: 1rem;
+                gap: 1.5rem;
                 text-align: center;
+                padding: 1.5rem;
             }
 
             .stat-value {
-                font-size: 1.5rem;
+                font-size: 2rem;
+            }
+
+            .quick-link {
+                padding: 1rem;
             }
         }
     </style>
@@ -369,10 +431,10 @@ $popularProducts = $pdo->query("
             </div>
         </div>
         <div class="forecast">
-    <h3>Sales Forecast for Next 5 Days</h3>
+    <h3>Sales Forecast for Next Days</h3>
     <?php if (!empty($salesForecast)): ?>
         <div class="forecast-list">
-            <?php for ($i = 1; $i <= 5; $i++): ?>
+            <?php for ($i = 1; $i <= 4; $i++): ?>
                 <div class="forecast-item">
                     <h4>Day <?php echo $i; ?></h4>
                     <p>$<?php echo $salesForecast[count($salesForecast) - 1]; ?></p>

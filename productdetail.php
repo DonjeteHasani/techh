@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'config.php';
+include 'recommendation_utils.php';
 
 // Check if the user is logged in
 $isLoggedIn = isset($_SESSION['user_id']); // Define a variable to use in JavaScript
@@ -40,9 +41,14 @@ $averageRating = round($ratingData['avg_rating'], 1);
 $reviewCount = $ratingData['review_count'];
 
 // Fetch related products
-$relatedStmt = $pdo->prepare("SELECT * FROM products WHERE category_id = ? AND id != ? ORDER BY RAND() LIMIT 4");
-$relatedStmt->execute([$product['category_id'], $productId]);
-$relatedProducts = $relatedStmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch related products using recommendation_utils.php
+$relatedProducts = getSimilarProducts($productId, $pdo, 4); // Fetch 4 similar products
+
+$recommendations = [];
+if (isset($_SESSION['user_id'])) {
+    $recommendations = getRecommendationsBasedOnHistory($_SESSION['user_id'], $pdo, 4);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -125,9 +131,35 @@ $relatedProducts = $relatedStmt->fetchAll(PDO::FETCH_ASSOC);
                     <i class="far fa-heart me-2"></i>Add to Wishlist
                 </button>
             </form>
+            
         </div>
     </div>
 </div>
+<!-- Similar Products Section -->
+<div class="container mt-5">
+    <h3>Similar Products You May Like</h3>
+    <div class="row">
+        <?php if (!empty($relatedProducts)): ?>
+            <?php foreach ($relatedProducts as $relatedProduct): ?>
+                <div class="col-md-3">
+                    <div class="card h-100">
+                        <img src="<?php echo htmlspecialchars($relatedProduct['image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($relatedProduct['name']); ?>">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo htmlspecialchars($relatedProduct['name']); ?></h5>
+                            <p class="product-price">$<?php echo number_format($relatedProduct['price'], 2); ?></p>
+                            <a href="productdetail.php?id=<?php echo $relatedProduct['id']; ?>" class="btn btn-primary">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>No similar products found.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -207,3 +239,4 @@ $relatedProducts = $relatedStmt->fetchAll(PDO::FETCH_ASSOC);
 </script>
 </body>
 </html>
+

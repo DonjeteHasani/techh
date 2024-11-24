@@ -56,6 +56,15 @@ $orderStmt->bindParam(3, $offset, PDO::PARAM_INT);
 $orderStmt->execute();
 $orders = $orderStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch customer metrics
+$metricsStmt = $pdo->prepare("SELECT total_score, is_high_value FROM customer_metrics WHERE user_id = ?");
+$metricsStmt->execute([$userId]);
+$metrics = $metricsStmt->fetch(PDO::FETCH_ASSOC);
+
+$loyaltyStmt = $pdo->prepare("SELECT loyalty_points FROM users WHERE id = ?");
+$loyaltyStmt->execute([$userId]);
+$loyaltyPoints = $loyaltyStmt->fetchColumn();
+
 // Fetch wishlist items
 $wishlistStmt = $pdo->prepare("
     SELECT p.* FROM products p 
@@ -78,132 +87,134 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
     
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
+            --primary-color: #4a90e2;
+            --secondary-color: #34495e;
             --accent-color: #e74c3c;
-            --background-color: #ecf0f1;
+            --background-color: #f5f6fa;
             --text-color: #2c3e50;
-            --border-radius: 12px;
-            --box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            --transition: all 0.3s ease;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            --transition: all 0.25s ease;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
         }
 
         .profile-container {
-            max-width: 1400px;
-            margin: 3rem auto;
-            padding: 0 2rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
         }
 
         .profile-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 3rem 2rem;
+            padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .profile-nav {
             background: white;
-            padding: 1.5rem;
+            padding: 1rem;
             border-radius: var(--border-radius);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             box-shadow: var(--box-shadow);
         }
 
         .nav-pills .nav-link {
             color: var(--text-color);
-            padding: 1rem 2rem;
-            margin: 0 0.5rem;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.25rem;
             border-radius: var(--border-radius);
             transition: var(--transition);
             font-weight: 500;
         }
 
         .nav-pills .nav-link:hover {
-            background-color: rgba(52, 152, 219, 0.1);
+            background-color: rgba(74, 144, 226, 0.1);
+            transform: translateY(-1px);
         }
 
         .nav-pills .nav-link.active {
-            background-color: var(--secondary-color);
+            background-color: var(--primary-color);
             color: white;
         }
 
         .content-section {
             background: white;
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-control {
             border-radius: var(--border-radius);
-            padding: 1rem;
-            border: 2px solid #e0e0e0;
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
             transition: var(--transition);
         }
 
         .form-control:focus {
-            box-shadow: none;
-            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            border-color: var(--primary-color);
         }
 
         .btn {
-            padding: 0.8rem 2rem;
+            padding: 0.75rem 1.5rem;
             border-radius: var(--border-radius);
-            font-weight: 600;
+            font-weight: 500;
             transition: var(--transition);
         }
 
         .btn-primary {
-            background-color: var(--secondary-color);
+            background-color: var(--primary-color);
             border: none;
         }
 
         .btn-primary:hover {
-            background-color: #2980b9;
+            background-color: #357abd;
             transform: translateY(-2px);
         }
 
         .order-card {
-            border: none;
-            background: #f8f9fa;
+            border: 1px solid #eee;
+            background: white;
             border-radius: var(--border-radius);
-            margin-bottom: 1.5rem;
-            padding: 1.5rem;
+            margin-bottom: 1rem;
+            padding: 1.25rem;
             transition: var(--transition);
         }
 
         .order-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: var(--box-shadow);
         }
 
         .wishlist-item {
-            background: #f8f9fa;
+            background: white;
             border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid #eee;
             transition: var(--transition);
         }
 
         .wishlist-item:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: var(--box-shadow);
         }
 
         .alert {
             border-radius: var(--border-radius);
-            padding: 1.2rem;
-            margin-bottom: 2rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
             border: none;
         }
 
@@ -211,64 +222,94 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .badge-gold {
+            background-color: #ffd700;
+            color: #000;
+        }
+
+        .badge-silver {
+            background-color: #c0c0c0;
+            color: #000;
+        }
+
+        .badge-bronze {
+            background-color: #cd7f32;
+            color: white;
         }
 
         .pagination .page-link {
             border-radius: var(--border-radius);
-            margin: 0 0.3rem;
-            color: var(--secondary-color);
+            margin: 0 0.2rem;
+            color: var(--primary-color);
             border: none;
-            padding: 0.8rem 1.2rem;
+            padding: 0.6rem 1rem;
         }
 
         .pagination .page-item.active .page-link {
-            background-color: var(--secondary-color);
+            background-color: var(--primary-color);
             color: white;
         }
 
         .empty-state {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 3rem 1.5rem;
         }
 
         .empty-state i {
-            font-size: 4rem;
-            color: var(--secondary-color);
-            margin-bottom: 1.5rem;
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
         }
 
         @media (max-width: 768px) {
             .profile-container {
                 padding: 0 1rem;
-                margin: 1.5rem auto;
+                margin: 1rem auto;
             }
 
             .profile-header {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem;
             }
 
             .nav-pills .nav-link {
-                padding: 0.8rem 1.2rem;
-                margin: 0.3rem;
+                padding: 0.6rem 1rem;
+                margin: 0.2rem;
             }
             
             .content-section {
                 padding: 1.5rem;
             }
-
-            .order-card, .wishlist-item {
-                padding: 1rem;
-            }
         }
 
-        /* Animation effects */
+        /* Smooth animations */
+        .tab-pane {
+            animation: fadeIn 0.3s ease-out;
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .tab-pane {
-            animation: fadeIn 0.5s ease-out;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
         }
     </style>
 </head>
@@ -279,11 +320,28 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="profile-header">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1 class="display-4 mb-2">Welcome back, <?php echo htmlspecialchars($user['username']); ?>!</h1>
-                <p class="lead mb-0">Member since <?php echo date('F Y', strtotime($user['created_at'])); ?></p>
+                <h1 class="h2 mb-2">Welcome back, <?php echo htmlspecialchars($user['username']); ?>!</h1>
+                <?php
+                if ($metrics && $metrics['is_high_value']) {
+                    echo '<div class="badge badge-success">High-Value Customer</div>';
+                } elseif ($loyaltyPoints >= 500) {
+                    echo '<div class="badge badge-gold">Gold Member</div>';
+                } elseif ($loyaltyPoints >= 300) {
+                    echo '<div class="badge badge-silver">Silver Member</div>';
+                } elseif ($loyaltyPoints >= 100) {
+                    echo '<div class="badge badge-bronze">Bronze Member</div>';
+                } else {
+                    echo '<div class="badge badge-light">Member</div>';
+                }
+                ?>
+                <p class="mb-0 mt-2">Member since <?php echo date('F Y', strtotime($user['created_at'])); ?></p>
+                <div class="mt-3">
+                    <h5>Loyalty Points: <span class="badge badge-light"><?php echo $loyaltyPoints; ?></span></h5>
+                    <small>Keep shopping to earn more rewards!</small>
+                </div>
             </div>
-            <div class="col-md-4 text-md-right">
-                <a href="logout.php" class="btn btn-light btn-lg">
+            <div class="col-md-4 text-md-right mt-3 mt-md-0">
+                <a href="logout.php" class="btn btn-light">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </div>
@@ -306,6 +364,11 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
             <li class="nav-item">
                 <a class="nav-link" id="wishlist-tab" data-toggle="pill" href="#wishlist" role="tab">
                     <i class="fas fa-heart"></i> Wishlist
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="recommendations-tab" data-toggle="pill" href="#recommendations" role="tab">
+                    <i class="fas fa-lightbulb"></i> For You
                 </a>
             </li>
         </ul>
@@ -367,6 +430,49 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
 
+        <div class="tab-pane fade" id="recommendations" role="tabpanel">
+            <div class="content-section">
+                <h3 class="mb-4">Recommended for You</h3>
+                <?php
+                $recommendStmt = $pdo->prepare("
+                    SELECT p.*, r.score 
+                    FROM user_recommendations r 
+                    JOIN products p ON r.product_id = p.id 
+                    WHERE r.user_id = ? 
+                    ORDER BY r.score DESC LIMIT 5
+                ");
+                $recommendStmt->execute([$userId]);
+                $recommendations = $recommendStmt->fetchAll(PDO::FETCH_ASSOC);
+                ?>
+                <?php if (!empty($recommendations)): ?>
+                    <div class="row">
+                        <?php foreach ($recommendations as $product): ?>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <img src="<?php echo htmlspecialchars($product['image']); ?>" 
+                                         class="card-img-top" 
+                                         alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h5>
+                                        <p class="card-text">$<?php echo number_format($product['price'], 2); ?></p>
+                                        <a href="productdetail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary btn-block">
+                                            View Product
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-lightbulb"></i>
+                        <h4>No Recommendations Yet</h4>
+                        <p class="text-muted">Keep exploring and shopping to get personalized recommendations!</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <!-- Orders Tab -->
         <div class="tab-pane fade" id="orders" role="tabpanel">
             <div class="content-section">
@@ -379,7 +485,7 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <h5 class="mb-0">Order #<?php echo $order['id']; ?></h5>
                                 </div>
                                 <div class="col-md-3">
-                                    <span class="text-muted">Total Amount:</span>
+                                    <span class="text-muted">Total:</span>
                                     <strong class="ml-2">$<?php echo number_format($order['total_amount'], 2); ?></strong>
                                 </div>
                                 <div class="col-md-3">
@@ -388,7 +494,7 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
                                     </span>
                                 </div>
                                 <div class="col-md-3 text-right">
-                                    <a href="order_details.php?order_id=<?php echo $order['id']; ?>" class="btn btn-outline-primary">
+                                    <a href="order_details.php?order_id=<?php echo $order['id']; ?>" class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-eye"></i> View Details
                                     </a>
                                 </div>
@@ -397,15 +503,17 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                     
                     <!-- Pagination -->
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?>#orders"><?php echo $i; ?></a>
-                                </li>
-                            <?php endfor; ?>
-                        </ul>
-                    </nav>
+                    <?php if ($totalPages > 1): ?>
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                    <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
+                                        <a class="page-link" href="?page=<?php echo $i; ?>#orders"><?php echo $i; ?></a>
+                                    </li>
+                                <?php endfor; ?>
+                            </ul>
+                        </nav>
+                    <?php endif; ?>
                 <?php else: ?>
                     <div class="empty-state">
                         <i class="fas fa-shopping-bag"></i>
@@ -438,7 +546,7 @@ $wishlistItems = $wishlistStmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="col-md-3 text-right">
                                     <form action="remove_from_wishlist.php" method="POST" style="display: inline;">
                                         <input type="hidden" name="product_id" value="<?php echo $item['id']; ?>">
-                                        <button type="submit" class="btn btn-outline-danger">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
                                             <i class="fas fa-trash"></i> Remove
                                         </button>
                                     </form>

@@ -153,7 +153,7 @@ The system combines AI-powered recommendations, a chatbot for customer interacti
 
 ## Acknowledgments
 
-This project was created as part of the **Champion Trials-48 Hour Challenge** hackathon in Digital School Ferizaj. Special thanks to the organizers, mentors, and team members for their support and guidance.
+This project was created as part of the **Champion Trials-48 Hour Challenge** hackathon in Digital School Ferizaj. Special thanks to the organizers, mentors, for their support and guidance.
 
 ---
 

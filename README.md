@@ -146,6 +146,27 @@ The system combines AI-powered recommendations, a chatbot for customer interacti
    - Administrators can set rules for earning points, thresholds for badges, and manage active rewards.
 
 ---
+## AI Features in TechAI
+
+1. **AI-Driven Product Recommendations**:
+   - Suggests products based on user preferences using collaborative filtering, content-based filtering, or hybrid techniques.
+   - Personalizes the shopping experience and boosts sales.
+
+2. **AI Chatbot**:
+   - Provides real-time customer support and product guidance using NLP.
+   - Enhances user engagement and reduces the need for human support.
+
+3. **Sales Forecasting**:
+   - Predicts future demand using historical sales data and time-series algorithms.
+   - Optimizes inventory and marketing strategies.
+
+4. **Popular Product Analytics**:
+   - Identifies top-selling products by analyzing user interactions and purchases.
+   - Helps focus on high-performing products for marketing.
+
+5. **Customer Behavior Analysis**:
+   - Tracks and clusters user actions to personalize recommendations.
+   - Enhances customer retention and satisfaction.
 
 
 

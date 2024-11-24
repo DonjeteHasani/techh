@@ -59,6 +59,38 @@ $subtotal = 0;
 foreach ($items as $item) {
     $subtotal += $item['price'] * $item['quantity'];
 }
+function updateLoyaltyPoints($pdo, $userId, $orderTotal) {
+    $earnedPoints = floor($orderTotal / 10); // 1 point for every $10 spent
+    $updateStmt = $pdo->prepare("UPDATE users SET loyalty_points = loyalty_points + ? WHERE id = ?");
+    $updateStmt->execute([$earnedPoints, $userId]);
+    return $earnedPoints;
+}
+$earnedPoints = updateLoyaltyPoints($pdo, $order['user_id'], $order['total_amount']);
+
+function assignBadge($pdo, $userId) {
+    // Fetch user's current points
+    $stmt = $pdo->prepare("SELECT loyalty_points FROM users WHERE id = ?");
+    $stmt->execute([$userId]);
+    $points = $stmt->fetchColumn();
+
+    // Determine badge based on points
+    if ($points > 500) {
+        $badge = 'Gold Member';
+    } elseif ($points > 250) {
+        $badge = 'Silver Member';
+    } else {
+        $badge = 'Bronze Member';
+    }
+
+    // Update badge in the database
+    $updateStmt = $pdo->prepare("UPDATE users SET customer_badge = ? WHERE id = ?");
+    $updateStmt->execute([$badge, $userId]);
+
+    return $badge;
+}
+$badge = assignBadge($pdo, $order['user_id']);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -284,6 +316,13 @@ foreach ($items as $item) {
                         </div>
                     </div>
                 </div>
+                <div class="alert alert-success">
+    <strong>Congratulations!</strong> You've earned <strong><?php echo $earnedPoints; ?> loyalty points</strong> for this purchase!
+</div>
+<div class="alert alert-info">
+    <strong>Your Badge:</strong> <span class="badge bg-primary"><?php echo $badge; ?></span>
+</div>
+
 
                 <div class="text-center mt-4 mb-5">
                     <a href="generate_pdf.php?order_id=<?php echo $orderId; ?>" class="btn btn-secondary me-2">

@@ -157,10 +157,4 @@ This project was created as part of the **Champion Trials-48 Hour Challenge** ha
 
 ---
 
-Admin Side:
 
-Administrators manage products, users, orders, and promotional coupons using a user-friendly dashboard.
-AI Features:
-
-The recommendation system analyzes customer behavior and suggests products that align with their preferences.
-The chatbot provides 24/7 assistance to improve customer engagement.
